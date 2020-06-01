@@ -8,12 +8,12 @@ import {
   CardMedia,
   CardContent,
   Icon,
-  Divider,
 } from '@material-ui/core';
-import ReactLoading from 'react-loading';
+// import ReactLoading from 'react-loading';
 import TimeInput from './TimeInput';
 
 import { appBlue, fontGreyPrimary, fontGreySecondary } from '../../resources/colors';
+import { getTotalTimeFromSteps } from '../../resources/helperFunctions';
 
 const style = {
   header: {
@@ -26,6 +26,8 @@ const style = {
   titleCard: {
     width: '100%',
     marginBottom: '.5em',
+
+    borderRadius: '0px',
   },
 
   recipeName: {
@@ -38,13 +40,14 @@ const style = {
     fontSize: '1.1em',
   },
   recipeSubtitle: {
-    color: fontGreyPrimary,
+    color: fontGreySecondary,
     textAlign: 'center',
     paddingBottom: '.2em',
   },
   ingredientImg: {
     height: '5em',
-    marginBottom: '.0',
+    marginBottom: '0',
+    paddingRight: '.3em',
   },
   centeredIngredient: {
     textAlign: 'center',
@@ -54,11 +57,13 @@ const style = {
     marginTop: '0',
     marginBottom: '.2em',
     fontSize: '1.3em',
+    paddingRight: '.3em',
   },
   ingQty: {
     marginTop: '0',
     marginBottom: '.3em',
     fontSize: '1.3em',
+    paddingRight: '.3em',
   },
   recipeInfoList: {
     marginTop: '2em',
@@ -96,7 +101,7 @@ const formatIngredientList = steps => {
   const isOdd = steps.length % 2 !== 0;
   let remainder = isOdd ? steps.splice(steps.length - 1, 1) : null;
   for (let i = 0; i < steps.length; i += 2) {
-    if (steps[i + 1] !== undefined) result.push(steps.slice(i, i + 2));
+    if (steps[i + 1]) result.push(steps.slice(i, i + 2));
   }
   if (remainder) result.push(remainder);
   return result;
@@ -157,7 +162,7 @@ class recipeIdContent extends Component {
 
                       <Grid item xs={4}>
                         <p style={style.infoListInfo}>
-                          {this.props.recipe.totalPrepTime + this.props.recipe.totalCookTime} mins
+                          {getTotalTimeFromSteps(this.props.steps)} mins
                         </p>
                       </Grid>
                       <Grid item xs={4}>
@@ -183,29 +188,27 @@ class recipeIdContent extends Component {
                     <Grid container>
                       {formatIngredientList(this.props.ingredients).map(ing => (
                         <React.Fragment key={ing[0].name}>
-                          <Grid
-                            style={style.centeredIngredient}
-                            item
-                            xs={ing[1] !== undefined ? 6 : 12}
-                          >
-                            <img style={style.ingredientImg} key={ing[0].name} src={ing[0].img} />
+                          <Grid style={style.centeredIngredient} item xs={ing[1] ? 6 : 12}>
+                            <img
+                              style={style.ingredientImg}
+                              alt={ing[0].name}
+                              key={ing[0].name}
+                              src={ing[0].img}
+                            />
                           </Grid>
-                          {ing[1] !== undefined ? (
+                          {ing[1] ? (
                             <Grid style={style.centeredIngredient} item xs={6}>
                               <img
+                                alt={ing[1].name}
                                 style={style.ingredientImg}
                                 key={ing[1].img}
-                                src={ing[1].img || null}
+                                src={ing[1].img}
                               />
                             </Grid>
                           ) : null}
 
                           {/* {ingredient names} */}
-                          <Grid
-                            style={style.centeredIngredient}
-                            item
-                            xs={ing[1] !== undefined ? 6 : 12}
-                          >
+                          <Grid style={style.centeredIngredient} item xs={ing[1] ? 6 : 12}>
                             <p style={style.ingQty} key={ing[0].quantity}>
                               {ing[0].quantity}
                             </p>
@@ -213,7 +216,7 @@ class recipeIdContent extends Component {
                               {ing[0].name}
                             </p>
                           </Grid>
-                          {ing[1] !== undefined ? (
+                          {ing[1] ? (
                             <Grid style={style.centeredIngredient} item xs={6}>
                               <p style={style.ingQty} key={ing[1].quantity}>
                                 {ing[1].quantity}
@@ -233,7 +236,6 @@ class recipeIdContent extends Component {
           </Card>
         </Grid>
       </Grid>
-      
     );
   }
 }

@@ -1,14 +1,17 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 // css components
-import { Typography, Grid, Hidden } from '@material-ui/core';
+import { Typography, Grid, Hidden, Button } from '@material-ui/core';
 import ResponsiveRootSlider from './ResponsiveSlider';
 //local components
+import SearchDialog from './SearchDialog';
+import { connect } from 'react-redux';
+import { fetchAllRecipes } from '../../redux/recipeAction';
 
 // icons
 // local images
 import scanButtonIcon from '../../resources/images/qrBtnIcon.svg';
-import graphic1 from '../../resources/images/root/infoImg1.svg';
+
 //local css
 import '../../App.css';
 //color pallette import
@@ -23,7 +26,7 @@ const style = {
   },
   scanText: {
     textAlign: 'center',
-    fontSize: '.7em',
+    fontSize: '1.2em',
     color: appBlue,
     paddingBottom: '1em',
   },
@@ -31,16 +34,19 @@ const style = {
     textAlign: 'center',
     fontSize: '1.2em',
     color: appBlue,
-    paddingBottom: '1em',
-    paddingTop: '1em',
   },
   titleHeader: {
-    marginTop: '.25em',
+    marginTop: '.5em',
     marginBottom: '.25em',
 
-    color: fontGreyPrimary,
+    color: appBlue,
   },
-  centerImage: {
+  titleSubHeader: {
+    marginBottom: '2em',
+    fontSize: '.9em',
+    color: fontGreySecondary,
+  },
+  centerContent: {
     width: '100%',
     display: 'flex',
     flexDirection: 'row',
@@ -53,60 +59,88 @@ const style = {
   infoHeadline: {
     fontSize: '1.2em',
   },
+  scannerButton: {
+    textTransform: 'none',
+    marginTop: '1rem',
+    marginBottom: '0',
+    padding: '0',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  scannerContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
 };
 
 class RootContent extends Component {
+  componentDidMount() {
+    this.props.fetchAllRecipes();
+  }
   render() {
     return (
-      <Grid alignContent="center" alignItems="center" justify="center" container>
+      <Grid alignItems="center" justify="center" container>
+        <Grid item xs={12} lg={7}>
+          <ResponsiveRootSlider title="Dine on Time" />
+        </Grid>
         <Grid item xs={12}>
           <Typography style={style.titleHeader} variant="display2" gutterBottom align="center">
             Dine on Time
           </Typography>
         </Grid>
-        <Grid item xs={12} lg={7}>
-          <ResponsiveRootSlider />
-        </Grid>
+
+        {/* <Grid item xs={12}>
+          <Typography style={style.titleSubHeader} variant="display1" gutterBottom align="center">
+            We're With You Every Step Of The Way
+          </Typography>
+        </Grid> */}
 
         <Hidden lgUp>
-          <Grid item xs={12}>
-            <div style={style.centerImage}>
-              <Link to="/scanner">
-                <img alt="camera icon" src={scanButtonIcon} />
-              </Link>
-            </div>
-            <Link to="/scanner" style={{ textDecoration: 'none' }}>
-              <Typography style={style.scanText} variant="subheading">
-                Scan A Recipe Code
-              </Typography>
-            </Link>
-          </Grid>
-
-          <Grid item xs={9}>
-            <Typography style={style.centerText} variant="subheading">
-              No QR code reader?
-              <Link to="/recipes/list" style={{ textDecoration: 'none' }}>
-                <span style={style.link}> Search the recipe by name</span>
-              </Link>
-            </Typography>
-          </Grid>
-        </Hidden>
-
-        <Hidden mdDown>
-          <Grid item xs={9}>
-            <Link to="/recipes/list" style={{ textDecoration: 'none' }}>
-              <Typography style={style.scanTextDesktop} component="h2">
-                Lookup A Recipe
-              </Typography>
-            </Link>
+          <Grid item xs style={style.scannerContainer}>
+            <Button component={Link} style={style.scannerButton} to="/scanner">
+              <Grid
+                container
+                direction="column"
+                justify="center"
+                style={style.scannerContainer}
+                alignItems="center"
+              >
+                <Grid item xs={12}>
+                  <img alt="camera icon" src={scanButtonIcon} />
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography style={style.scanText} variant="subheading">
+                    Scan A Recipe Code
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Button>
           </Grid>
         </Hidden>
+        <Grid style={style.centerContent} item xs={12}>
+          <SearchDialog text="Search Recipe" />
+        </Grid>
       </Grid>
     );
   }
 }
 
-export default RootContent;
+const mapStateToProps = state => {
+  return {
+    ...state,
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    fetchAllRecipes: () => dispatch(fetchAllRecipes()),
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(RootContent);
 
 // <Grid item xs={12}>
 //   <Typography variant="display1" component="h1" style={style.infoHeadline}>
